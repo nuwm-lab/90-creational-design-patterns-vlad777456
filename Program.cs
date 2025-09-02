@@ -15,6 +15,9 @@ namespace GameFactory
     }
 
     // ----- Hero types -----
+    /// <summary>
+    /// Клас Мага.
+    /// </summary>
     public class Mage : IHero
     {
         public string Name { get; }
@@ -24,17 +27,19 @@ namespace GameFactory
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be empty.");
+            if (health <= 0)
+                throw new ArgumentException("Health must be greater than zero.");
 
             Name = name;
             Health = health;
         }
 
-        public void PerformAction()
-        {
-            Console.WriteLine($"{Name} (Mage) casts Fireball! - Health: {Health}");
-        }
+        public void PerformAction() => Console.WriteLine($"{Name} (Mage) casts Fireball! - Health: {Health}");
     }
 
+    /// <summary>
+    /// Клас Воїна.
+    /// </summary>
     public class Warrior : IHero
     {
         public string Name { get; }
@@ -44,17 +49,19 @@ namespace GameFactory
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be empty.");
+            if (health <= 0)
+                throw new ArgumentException("Health must be greater than zero.");
 
             Name = name;
             Health = health;
         }
 
-        public void PerformAction()
-        {
-            Console.WriteLine($"{Name} (Warrior) strikes with a sword! - Health: {Health}");
-        }
+        public void PerformAction() => Console.WriteLine($"{Name} (Warrior) strikes with a sword! - Health: {Health}");
     }
 
+    /// <summary>
+    /// Клас Лучника.
+    /// </summary>
     public class Archer : IHero
     {
         public string Name { get; }
@@ -64,38 +71,46 @@ namespace GameFactory
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name cannot be empty.");
+            if (health <= 0)
+                throw new ArgumentException("Health must be greater than zero.");
 
             Name = name;
             Health = health;
         }
 
-        public void PerformAction()
-        {
-            Console.WriteLine($"{Name} (Archer) shoots an arrow! - Health: {Health}");
-        }
+        public void PerformAction() => Console.WriteLine($"{Name} (Archer) shoots an arrow! - Health: {Health}");
     }
 
     // ----- Abstract factory -----
-    public interface IHeroFactory
+    /// <summary>
+    /// Базова фабрика для створення героїв.
+    /// </summary>
+    public abstract class HeroFactory
     {
-        IHero CreateMage(string name);
-        IHero CreateWarrior(string name);
-        IHero CreateArcher(string name);
+        public abstract IHero CreateMage(string name);
+        public abstract IHero CreateWarrior(string name);
+        public abstract IHero CreateArcher(string name);
     }
 
     // ----- Concrete factories -----
-    public class HumanHeroFactory : IHeroFactory
+    /// <summary>
+    /// Фабрика для створення Людей.
+    /// </summary>
+    public class HumanHeroFactory : HeroFactory
     {
-        public IHero CreateMage(string name) => new Mage(name, 80);
-        public IHero CreateWarrior(string name) => new Warrior(name, 120);
-        public IHero CreateArcher(string name) => new Archer(name, 90);
+        public override IHero CreateMage(string name) => new Mage(name, 80);
+        public override IHero CreateWarrior(string name) => new Warrior(name, 120);
+        public override IHero CreateArcher(string name) => new Archer(name, 90);
     }
 
-    public class OrcHeroFactory : IHeroFactory
+    /// <summary>
+    /// Фабрика для створення Орків.
+    /// </summary>
+    public class OrcHeroFactory : HeroFactory
     {
-        public IHero CreateMage(string name) => new Mage(name, 70);
-        public IHero CreateWarrior(string name) => new Warrior(name, 150);
-        public IHero CreateArcher(string name) => new Archer(name, 85);
+        public override IHero CreateMage(string name) => new Mage(name, 70);
+        public override IHero CreateWarrior(string name) => new Warrior(name, 150);
+        public override IHero CreateArcher(string name) => new Archer(name, 85);
     }
 
     // ----- Client code -----
@@ -103,11 +118,9 @@ namespace GameFactory
     {
         public static void Main()
         {
-            // Демонстрація: створюємо дві "сім'ї" героїв
-            IHeroFactory humanFactory = new HumanHeroFactory();
-            IHeroFactory orcFactory = new OrcHeroFactory();
+            HeroFactory humanFactory = new HumanHeroFactory();
+            HeroFactory orcFactory = new OrcHeroFactory();
 
-            // Створюємо партію героїв за допомогою фабрик
             var heroes = new List<IHero>
             {
                 humanFactory.CreateMage("Elena"),
@@ -119,19 +132,10 @@ namespace GameFactory
                 orcFactory.CreateArcher("Rag"),
             };
 
-            // Викликаємо дії героїв через єдиний інтерфейс
             foreach (var hero in heroes)
             {
                 hero.PerformAction();
             }
-
-            // Зразок виходу програми
-            // Elena (Mage) casts Fireball! - Health: 80
-            // Borislav (Warrior) strikes with a sword! - Health: 120
-            // Ilya (Archer) shoots an arrow! - Health: 90
-            // Gor'uk (Mage) casts Fireball! - Health: 70
-            // Thrag (Warrior) strikes with a sword! - Health: 150
-            // Rag (Archer) shoots an arrow! - Health: 85
         }
     }
 }
